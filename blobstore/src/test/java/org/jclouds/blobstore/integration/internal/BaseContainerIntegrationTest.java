@@ -222,6 +222,20 @@ public class BaseContainerIntegrationTest extends BaseBlobStoreIntegrationTest {
          // now should be completely empty
          assert container.getNextMarker() == null;
          assert container.size() == 0 : container;
+         
+         // try 2 level deep directory more blobs
+         view.getBlobStore().createDirectory(containerName, directory + "/" + directory);
+         addTenObjectsUnderPrefix(containerName, directory);
+         addTenObjectsUnderPrefix(containerName, directory + "/" + directory);
+         
+         // should have 11 elements 10 blobs and 1 directory
+         container = view.getBlobStore().list(containerName, inDirectory(directory));
+         assert container.size() == 11 : container;
+         
+         // should have 10 elements = 10 blobs
+         container = view.getBlobStore().list(containerName, inDirectory(directory + "/" + directory));
+         assert container.size() == 10 : container;
+         
       } finally {
          returnContainer(containerName);
       }
